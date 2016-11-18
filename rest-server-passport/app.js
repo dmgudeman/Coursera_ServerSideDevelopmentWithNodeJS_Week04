@@ -27,12 +27,13 @@ var leaderRouter = require('./routes/leaderRouter');
 var app = express();
 
 // Secure traffic only
-app.all('*', function (req, res, next) {
+app.all('*', function(req, res, next){
     console.log('req start: ',req.secure, req.hostname, req.url, app.get('port'));
-  if(req.secure) {
-    return next ();
+  if (req.secure) {
+    return next();
   };
-  res.redirect('https://'+req.hostname+':'+app.get('secPort')+req.url);
+
+ res.redirect('https://'+req.hostname+':'+app.get('secPort')+req.url);
 });
 
 // view engine setup
