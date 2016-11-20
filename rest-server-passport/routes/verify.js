@@ -34,21 +34,13 @@ exports.verifyOrdinaryUser = function (req, res, next) {
         return next(err);
     }
 };
+// verify Admin user
 exports.verifyAdmin = function (req, res, next) {
-    var admin = req.decoded._doc.admin;
-    if (admin === true) {
-        if (err) {
-            var err = new Error('You do not have administrative privleges!');
-            err.status = 401;
-            return next(err);
-        } else {
-            next();
-        }
+    if (req.decoded._doc.admin == true) {
+        next();
     } else {
-        // if there is no token
-        // return an error
-        var err = new Error('You are not authenticated!');
-        err.status = 401;
+        var err = new Error('You are not authorized to perform this operation!');
+        err.status = 403;
         return next(err);
     }
 };
