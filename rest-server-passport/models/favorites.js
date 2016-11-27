@@ -1,7 +1,6 @@
 // grab the things we need
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-
 // require('mongoose-currency').loadType(mongoose);
 // var Currency = mongoose.Types.Currency;
 
@@ -33,10 +32,13 @@ var Schema = mongoose.Schema;
 
 // create a schema
 var favoriteSchema = new Schema({
-    favoriteId: {
-        type: String,
-        required: true,
-        unique: true
+    favoriteDishId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Dish',
+    },
+    favoritePostedBy:  {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 }, {
     timestamps: true

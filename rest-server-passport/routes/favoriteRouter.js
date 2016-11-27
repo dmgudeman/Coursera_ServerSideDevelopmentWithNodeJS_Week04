@@ -1,7 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-var Favorites = require('../models/dishes');
+var Dishes = require('../models/dishes');
 var Favorites = require('../models/favorites')
 
 var favoriteRouter = express.Router();
@@ -12,7 +12,7 @@ var Verify = require('./verify');
 favoriteRouter.route('/')
 .get(Verify.verifyOrdinaryUser,  function (req, res, next) {
     Favorites.find({})
-  //  .populate('postedBy')
+    .populate('postedBy')
     .exec(function (err, favorite) {
         if (err) throw err;
         res.json(favorite);
@@ -32,12 +32,12 @@ favoriteRouter.route('/')
     });
 })
 
-// .delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
-//     Favorites.remove({}, function (err, resp) {
-//         if (err) throw err;
-//         res.json(resp);
-//     });
-// });
+.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
+    Favorites.remove({}, function (err, resp) {
+        if (err) throw err;
+        res.json(resp);
+    });
+});
 
 // favoriteRouter.route('/:favoriteId')
 // .get(function (req, res, next) {
