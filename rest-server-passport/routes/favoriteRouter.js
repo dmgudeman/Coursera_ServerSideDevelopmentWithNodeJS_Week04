@@ -10,34 +10,66 @@ favoriteRouter.use(bodyParser.json());
 var Verify = require('./verify');
 
 favoriteRouter.route('/')
-.get(Verify.verifyOrdinaryUser,  function (req, res, next) {
-    Favorites.find({})
-    .populate('postedBy')
-    .exec(function (err, favorite) {
-        if (err) throw err;
-        res.json(favorite);
-    });
-})
+    .all(Verify.verifyOrdinaryUser)
+    .get(function (req, res, next) {
+        Favorites.find({'postedBy': req.decoded._doc._id})
+            .populate('postedBy')
+            .populate('dishes')
+            .exec(function (err, favorites) {
+                if (err) return err;
+                res.json(favorites);
+            });
+    })
 
-.post(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
-    Favorites.create(req.body, function (err, favorite) {
-        if (err) throw err;
-        console.log('favorite created!');
-        var id = favorite._id;
+    .post(function (req, res, next) {
 
-        res.writeHead(200, {
-            'Content-Type': 'text/plain'
-        });
-        res.end('Added the favorite with id: ' + id);
-    });
-})
+        Favorites.find({'postedBy': req.decoded._doc._id})
+            .exec(function (err, favorites) {
+                if (err) throw err;
+                req.body.postedBy = req.decoded._doc._id;
 
-.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
-    Favorites.remove({}, function (err, resp) {
-        if (err) throw err;
-        res.json(resp);
+                if (favorites.length) {
+                    var favoriteAlreadyExist = false;
+                    if (favorites[0].dishes.length) {
+                        for (var i = (favorites[0].dishes.length - 1); i >= 0; i--) {
+                            favoriteAlreadyExist = favorites[0].dishes[i] == req.body._id;
+                            if (favoriteAlreadyExist) break;
+                        }
+                    }
+                    if (!favoriteAlreadyExist) {
+                        favorites[0].dishes.push(req.body._id);
+                        favorites[0].save(function (err, favorite) {
+                            if (err) throw err;
+                            console.log('Um somethings up!');
+                            res.json(favorite);
+                        });
+                    } else {
+                        console.log('Setup!');
+                        res.json(favorites);
+                    }
+
+                } else {
+
+                    Favorites.create({postedBy: req.body.postedBy}, function (err, favorite) {
+                        if (err) throw err;
+                        favorite.dishes.push(req.body._id);
+                        favorite.save(function (err, favorite) {
+                            if (err) throw err;
+                            console.log('Something is up!');
+                            res.json(favorite);
+                        });
+                    })
+                }
+            });
+    })
+
+
+.delete(function (req, res, next) {
+        Favorites.remove({'postedBy': req.decoded._doc._id}, function (err, resp) {
+            if (err) throw err;
+            res.json(resp);
+        })
     });
-});
 
 // favoriteRouter.route('/:favoriteId')
 // .get(function (req, res, next) {

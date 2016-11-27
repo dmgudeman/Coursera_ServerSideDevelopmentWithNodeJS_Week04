@@ -32,17 +32,17 @@ var Schema = mongoose.Schema;
 
 // create a schema
 var favoriteSchema = new Schema({
-    favoriteDishId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Dish',
-    },
-    favoritePostedBy:  {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        postedBy: {
+            required: true
+            ,type: mongoose.Schema.Types.ObjectId
+            ,ref: 'User'
+        }
+        , dishes: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Dish' } ]
     }
-}, {
-    timestamps: true
-});
+    , {
+        timestamps : true
+    }
+);
 
 // the schema is useless so far
 // we need to create a model using it
