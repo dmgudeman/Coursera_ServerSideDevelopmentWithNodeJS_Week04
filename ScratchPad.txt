@@ -1,0 +1,9 @@
+{
+	"name": "Dish 1",
+	"image":"Picture Dish 1",
+	"category":"Main course",
+	"label":"Hot",
+	"price":"5.99",
+	"description":"blah, blah, blah",
+	"comments":[]
+}

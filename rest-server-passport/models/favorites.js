@@ -1,6 +1,6 @@
 // grab the things we need
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 
 
@@ -8,7 +8,7 @@ var Schema = mongoose.Schema;
 
 
 // create a schema
-var favoriteSchema = new Schema({
+const favoriteSchema = new Schema({
         postedBy: {
             required: true
             ,type: mongoose.Schema.Types.ObjectId
