@@ -3,7 +3,6 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var Dishes = require('../models/dishes');
 var Favorites = require('../models/favorites')
-
 var favoriteRouter = express.Router();
 favoriteRouter.use(bodyParser.json());
 
@@ -23,38 +22,24 @@ favoriteRouter.route('/')
 
     .post(function (req, res, next) {
 
-        Favorites.update({'postedBy': req.decoded._doc._id}, {$push: {dishes:req.body._id}} ,function (err, favorite) {
+        Favorites.find({'postedBy': req.decoded._doc._id})
+            .populate('dishes._id')
+            .exec(function (err, favorites) {
                 if (err) throw err;
-            res.json(favorite);
+
+                console.log(JSON.stringify(favorites.dishes, null, "\t"));
+                req.body.postedBy = req.decoded._doc._id;
 
 
-    //            if (favorite.dishes) {
-    //
-    //                    favorite.dishes.push(req.body._id);
-    //                    favorite.dishes.save(function (err, favorite) {
-    //                        if (err) throw err;
-    //                        console.log('pushed one!');
-    //                        res.json(favorite);
-    //                    });
-    //
-    //
-    //            } else {
-    //
-    //                Favorites.create({postedBy: req.body.postedBy}, function (err, favorite) {
-    //                    if (err) throw err;
-    //                    favorite.dishes.push(req.body._id);
-    //                    favorite.save(function (err, favorite) {
-    //                        if (err) throw err;
-    //                        console.log('created and pushed one');
-    //                        res.json(favorite);
-    //                    });
-    //                })
-    //            }
-           });
+                Favorites.update({'postedBy': req.decoded._doc._id}, {$push: {dishes: req.body._id}}, {upsert: true}, function (err, favorite) {
+                    if (err) throw err;
+                    res.json(favorite);
+                });
+            });
     })
 
 
-.delete(function (req, res, next) {
+    .delete(function (req, res, next) {
         Favorites.remove({'postedBy': req.decoded._doc._id}, function (err, resp) {
             if (err) throw err;
             res.json(resp);
@@ -142,11 +127,11 @@ favoriteRouter.route('/')
 //     // comment as a new comment
 //     Favorites.findById(req.params.favoriteId, function (err, favorite) {
 //         if (err) throw err;
-        
+
 //         favorite.comments.id(req.params.commentId).remove();
-       
+
 //         req.body.postedBy = req.decoded._doc._id;
-        
+
 //         favorite.comments.push(req.body);
 //         favorite.save(function (err, favorite) {
 //             if (err) throw err;
@@ -158,7 +143,7 @@ favoriteRouter.route('/')
 
 // .delete(function (req, res, next) {
 //     Favorites.findById(req.params.favoriteId, function (err, favorite) {
-        
+
 //         if(favorite.comments.id(req.params.commentId).postedBy != req.decoded._doc._id) {
 //             var err = new Error('You are not authorized to perform this operation!');
 //             err.status = 403;

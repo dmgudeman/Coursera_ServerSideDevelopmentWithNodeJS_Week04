@@ -3,6 +3,10 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 
+
+
+
+
 // create a schema
 var favoriteSchema = new Schema({
         postedBy: {
@@ -10,16 +14,20 @@ var favoriteSchema = new Schema({
             ,type: mongoose.Schema.Types.ObjectId
             ,ref: 'User'
         }
-        , dishes: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Dish' } ]
+        , dishes: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Dish'
+        } ]
     }
     , {
         timestamps : true
     }
 );
 
-// the schema is useless so far
-// we need to create a model using it
-var Favorites = mongoose.model('Favorite', favoriteSchema);
 
+
+var Favorites = mongoose.model('Favorite', favoriteSchema);
+favoriteSchema.statics.isEmpty = function(cb) {
+    return(this.model('Favorite').dishes.length, cb)};
 // make this available to our Node applications
 module.exports = Favorites;
