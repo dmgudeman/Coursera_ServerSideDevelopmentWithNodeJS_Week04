@@ -31,7 +31,7 @@ favoriteRouter.route('/')
                 req.body.postedBy = req.decoded._doc._id;
 
 
-                Favorites.update({'postedBy': req.decoded._doc._id}, {$push: {dishes: req.body._id}}, {upsert: true}, function (err, favorite) {
+                Favorites.update({'postedBy': req.decoded._doc._id}, {$addToSet: {dishes: req.body._id}}, {upsert: true}, function (err, favorite) {
                     if (err) throw err;
                     res.json(favorite);
                 });
